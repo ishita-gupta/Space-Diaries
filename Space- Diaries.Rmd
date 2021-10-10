@@ -1,0 +1,1129 @@
+---
+title: "Space Diaries"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    social: menu
+    theme: paper
+    source_code: embed
+    vertical_layout: fill
+    runtime: shiny
+---
+
+<style>                     
+.navbar {
+  background-color:black;
+  hover-color:yellow;
+}
+
+</style> 
+
+
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(shiny)
+library(knitr)
+library("tm")
+library("SnowballC")
+library("wordcloud")
+library("wordcloud2")
+library("RColorBrewer")
+library("syuzhet")
+library(ggplot2)
+library(dslabs)
+library(imager)
+library(ngram)
+```
+<html>
+  <head>
+    <meta charset="utf-8">
+    <style>
+body {
+    margin: 0;
+    height: 100vh;
+    font-weight: 100;
+    background: radial-gradient(#a23982,#1f1013);
+    -webkit-overflow-Y: hidden;
+    -moz-overflow-Y: hidden;
+    -o-overflow-Y: hidden;
+    overflow-y: hidden;
+    -webkit-animation: fadeIn 1 1s ease-out;
+    -moz-animation: fadeIn 1 1s ease-out;
+    -o-animation: fadeIn 1 1s ease-out;
+    animation: fadeIn 1 1s ease-out;
+}
+
+button{
+  position: absolute;
+  border: 2px solid white;
+  background: transparent;
+  font-family: 'Roboto', sans-serif;
+  color: white;
+  width: 250px;
+  height: 50px;
+  font-size: 2em;
+  border-radius: 5px;
+  opacity: .5;
+  top: 60vh;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  margin: auto;
+  transition: .3s;
+}
+
+button:hover{
+  border: 2px solid #104F55;
+  background-color: rgba(365,365,365,0.5);
+  cursor: pointer;
+  color: #104F55;
+  opacity: .8;
+  transition: .3s;
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+}
+
+.light {
+    position: absolute;
+    width: 0px;
+    opacity: .75;
+    background-color: white;
+    box-shadow: #e9f1f1 0px 0px 20px 2px;
+    opacity: 0;
+    top: 100vh;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    margin: auto;
+}
+
+.x1{
+  -webkit-animation: floatUp 4s infinite linear;
+  -moz-animation: floatUp 4s infinite linear;
+  -o-animation: floatUp 4s infinite linear;
+  animation: floatUp 4s infinite linear;
+   -webkit-transform: scale(1.0);
+   -moz-transform: scale(1.0);
+   -o-transform: scale(1.0);
+  transform: scale(1.0);
+}
+
+.x2{
+  -webkit-animation: floatUp 7s infinite linear;
+  -moz-animation: floatUp 7s infinite linear;
+  -o-animation: floatUp 7s infinite linear;
+  animation: floatUp 7s infinite linear;
+  -webkit-transform: scale(1.6);
+  -moz-transform: scale(1.6);
+  -o-transform: scale(1.6);
+  transform: scale(1.6);
+  left: 15%;
+}
+
+.x3{
+  -webkit-animation: floatUp 2.5s infinite linear;
+  -moz-animation: floatUp 2.5s infinite linear;
+  -o-animation: floatUp 2.5s infinite linear;
+  animation: floatUp 2.5s infinite linear;
+  -webkit-transform: scale(.5);
+  -moz-transform: scale(.5);
+  -o-transform: scale(.5);
+  transform: scale(.5);
+  left: -15%;
+}
+
+.x4{
+  -webkit-animation: floatUp 4.5s infinite linear;
+  -moz-animation: floatUp 4.5s infinite linear;
+  -o-animation: floatUp 4.5s infinite linear;
+  animation: floatUp 4.5s infinite linear;
+  -webkit-transform: scale(1.2);
+  -moz-transform: scale(1.2);
+  -o-transform: scale(1.2);
+  transform: scale(1.2);
+  left: -34%;
+}
+
+.x5{
+  -webkit-animation: floatUp 8s infinite linear;
+  -moz-animation: floatUp 8s infinite linear;
+  -o-animation: floatUp 8s infinite linear;
+  animation: floatUp 8s infinite linear;
+  -webkit-transform: scale(2.2);
+  -moz-transform: scale(2.2);
+  -o-transform: scale(2.2);
+  transform: scale(2.2);
+  left: -57%;
+}
+
+.x6{
+  -webkit-animation: floatUp 3s infinite linear;
+  -moz-animation: floatUp 3s infinite linear;
+  -o-animation: floatUp 3s infinite linear;
+  animation: floatUp 3s infinite linear;
+  -webkit-transform: scale(.8);
+  -moz-transform: scale(.8);
+  -o-transform: scale(.8);
+  transform: scale(.8);
+  left: -81%;
+}
+
+.x7{
+  -webkit-animation: floatUp 5.3s infinite linear;
+  -moz-animation: floatUp 5.3s infinite linear;
+  -o-animation: floatUp 5.3s infinite linear;
+  animation: floatUp 5.3s infinite linear;
+  -webkit-transform: scale(3.2);
+  -moz-transform: scale(3.2);
+  -o-transform: scale(3.2);
+  transform: scale(3.2);
+  left: 37%;
+}
+
+.x8{
+  -webkit-animation: floatUp 4.7s infinite linear;
+  -moz-animation: floatUp 4.7s infinite linear;
+  -o-animation: floatUp 4.7s infinite linear;
+  animation: floatUp 4.7s infinite linear;
+  -webkit-transform: scale(1.7);
+  -moz-transform: scale(1.7);
+  -o-transform: scale(1.7);
+  transform: scale(1.7);
+  left: 62%;
+}
+
+.x9{
+  -webkit-animation: floatUp 4.1s infinite linear;
+  -moz-animation: floatUp 4.1s infinite linear;
+  -o-animation: floatUp 4.1s infinite linear;
+  animation: floatUp 4.1s infinite linear;
+  -webkit-transform: scale(0.9);
+  -moz-transform: scale(0.9);
+  -o-transform: scale(0.9);
+  transform: scale(0.9);
+  left: 85%;
+}
+
+button:focus{
+  outline: none;
+}
+
+@-webkit-keyframes floatUp{
+  0%{top: 100vh; opacity: 0;}
+  25%{opacity: 1;}
+  50%{top: 0vh; opacity: .8;}
+  75%{opacity: 1;}
+  100%{top: -100vh; opacity: 0;}
+}
+@-moz-keyframes floatUp{
+  0%{top: 100vh; opacity: 0;}
+  25%{opacity: 1;}
+  50%{top: 0vh; opacity: .8;}
+  75%{opacity: 1;}
+  100%{top: -100vh; opacity: 0;}
+}
+@-o-keyframes floatUp{
+  0%{top: 100vh; opacity: 0;}
+  25%{opacity: 1;}
+  50%{top: 0vh; opacity: .8;}
+  75%{opacity: 1;}
+  100%{top: -100vh; opacity: 0;}
+}
+@keyframes floatUp{
+  0%{top: 100vh; opacity: 0;}
+  25%{opacity: 1;}
+  50%{top: 0vh; opacity: .8;}
+  75%{opacity: 1;}
+  100%{top: -100vh; opacity: 0;}
+}
+
+.header{
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Roboto', sans-serif;
+  font-weight: 200;
+  color: white;
+  font-size: 2em;
+}
+
+#head1, #head2,#head3, #head4, #head5{
+  opacity: 0;
+}
+
+#head1{
+  -webkit-animation: fadeOut 1 5s ease-in;
+  -moz-animation: fadeOut 1 5s ease-in;
+  -o-animation: fadeOut 1 5s ease-in;
+  animation: fadeOut 1 5s ease-in;
+}
+
+#head2{
+  -webkit-animation: fadeOut 1 5s ease-in;
+  -moz-animation: fadeOut 1 5s ease-in;
+  -o-animation: fadeOut 1 5s ease-in;
+  animation: fadeOut 1 5s ease-in;
+  -webkit-animation-delay: 6s;
+  -moz-animation-delay: 6s;
+  -o-animation-delay: 6s;
+  animation-delay: 6s;
+}
+
+#head3{
+  -webkit-animation: fadeOut 1 5s ease-in;
+  -moz-animation: fadeOut 1 5s ease-in;
+  -o-animation: fadeOut 1 5s ease-in;
+  animation: fadeOut 1 5s ease-in;
+  -webkit-animation-delay: 12s;
+  -moz-animation-delay: 12s;
+  -o-animation-delay: 12s;
+  animation-delay: 12s;
+}
+
+#head4{
+  -webkit-animation: fadeOut 1 5s ease-in;
+  -moz-animation: fadeOut 1 5s ease-in;
+  -o-animation: fadeOut 1 5s ease-in;
+  animation: fadeOut 1 5s ease-in;
+  -webkit-animation-delay: 17s;
+  -moz-animation-delay: 17s;
+  -o-animation-delay: 17s;
+  animation-delay: 17s;
+}
+
+#head5{
+  -webkit-animation: finalFade 1 5s ease-in;
+  -moz-animation: finalFade 1 5s ease-in;
+  -o-animation: finalFade 1 5s ease-in;
+  animation: finalFade 1 5s ease-in;
+  -webkit-animation-fill-mode: forwards;
+  -moz-animation-fill-mode: forwards;
+  -o-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
+  -webkit-animation-delay: 22s;
+  -moz-animation-delay: 22s;
+  -o-animation-delay: 22s;
+  animation-delay: 22s;
+}
+
+@-webkit-keyframes fadeIn{
+  from{opacity: 0;}
+  to{opacity: 1;}
+}
+
+@-moz-keyframes fadeIn{
+  from{opacity: 0;}
+  to{opacity: 1;}
+}
+
+@-o-keyframes fadeIn{
+  from{opacity: 0;}
+  to{opacity: 1;}
+}
+
+@keyframes fadeIn{
+  from{opacity: 0;}
+  to{opacity: 1;}
+}
+
+@-webkit-keyframes fadeOut{
+  0%{opacity: 0;}
+  30%{opacity: 1;}
+  80%{opacity: .9;}
+  100%{opacity: 0;}
+}
+
+@-moz-keyframes fadeOut{
+  0%{opacity: 0;}
+  30%{opacity: 1;}
+  80%{opacity: .9;}
+  100%{opacity: 0;}
+}
+
+@-o-keyframes fadeOut{
+  0%{opacity: 0;}
+  30%{opacity: 1;}
+  80%{opacity: .9;}
+  100%{opacity: 0;}
+}
+
+@keyframes fadeOut{
+  0%{opacity: 0;}
+  30%{opacity: 1;}
+  80%{opacity: .9;}
+  100%{opacity: 0;}
+}
+
+@-webkit-keyframes finalFade{
+  0%{opacity: 0;}
+  30%{opacity: 1;}
+  80%{opacity: .9;}
+  100%{opacity: 1;}
+}
+
+@-moz-keyframes finalFade{
+  0%{opacity: 0;}
+  30%{opacity: 1;}
+  80%{opacity: .9;}
+  100%{opacity: 1;}
+}
+
+@-o-keyframes finalFade{
+  0%{opacity: 0;}
+  30%{opacity: 1;}
+  80%{opacity: .9;}
+  100%{opacity: 1;}
+}
+
+@keyframes finalFade{
+  0%{opacity: 0;}
+  30%{opacity: 1;}
+  80%{opacity: .9;}
+  100%{opacity: 1;}
+}
+
+#footer{
+  font-family: 'Roboto', sans-serif;
+  font-size: 1.2em;
+  color: white;
+  position: fixed;
+  -webkit-transform: translate(95vw,90vh);
+  -moz-transform: translate(95vw,90vh);
+  transform: translate(95vw,90vh);
+  transform: translate(95vw,90vh);
+}
+    </style>
+   
+    <title>Document</title>
+  </head>
+  <body>
+<link href="https://fonts.googleapis.com/css?family=Roboto:100" rel="stylesheet">
+
+
+  <div class='light x1'></div>
+  <div class='light x2'></div>
+  <div class='light x3'></div>
+  <div class='light x4'></div>
+  <div class='light x5'></div>
+  <div class='light x6'></div>
+  <div class='light x7'></div>
+  <div class='light x8'></div>
+  <div class='light x9'></div>
+
+  </body>
+</html>
+
+
+Upload Your Diary
+=====================================================================
+
+
+
+row {data-width=650}
+----------------------------------------------------------------------
+### Date
+```{r}
+valueBox(value=Sys.Date(),icon="fa-calendar",color="white")
+
+```
+
+### Time
+```{r}
+valueBox(value=format(Sys.time(),"%X"),icon="fa-clock",color="white")
+
+```
+
+### Time Zone
+```{r}
+#textOutput("len")
+temp <-Sys.timezone()
+valueBox(value=temp,icon="fa-globe",color="white")
+
+
+```
+
+
+Column {data-width=250}
+----------------------------------------------------------------------
+
+
+
+```{r}
+
+                                    fileInput('file1', 'Upload your Diary',
+                accept=c('text/csv', 
+                         'text/comma-separated-values,text/plain', 
+                         '.csv','.tsv'))
+ 
+   
+tags$style("
+             .btn-file {  
+             background-color:black; 
+             border-color: white;
+             color:white;
+            
+             
+             }
+
+             ")
+
+ tableOutput("contents")
+ 
+  
+
+```
+
+Column {data-width=250}
+----------------------------------------------------------------------
+
+
+```{r}
+
+output$contents <- renderTable({
+        
+        # input$file1 will be NULL initially. After the user selects
+        # and uploads a file, head of that data file by default,
+        # or all rows if selected, will be shown.
+        
+        req(input$file1)
+        
+        text <- readLines(input$file1$datapath)
+        # Load the data as a corpus
+        TextDoc <- Corpus(VectorSource(text))
+        
+        #Replacing "/", "@" and "|" with space
+        toSpace <- content_transformer(function (x , pattern ) gsub(pattern, " ", x))
+        TextDoc <- tm_map(TextDoc, toSpace, "/")
+        TextDoc <- tm_map(TextDoc, toSpace, "@")
+        TextDoc <- tm_map(TextDoc, toSpace, "\\|")
+        # Convert the text to lower case
+        TextDoc <- tm_map(TextDoc, content_transformer(tolower))
+        # Remove numbers
+        TextDoc <- tm_map(TextDoc, removeNumbers)
+        # Remove english common stopwords
+        TextDoc <- tm_map(TextDoc, removeWords, stopwords("english"))
+        # Remove your own stop word
+        # specify your custom stopwords as a character vector
+        TextDoc <- tm_map(TextDoc, removeWords, c("s", "company", "team")) 
+        # Remove punctuations
+        TextDoc <- tm_map(TextDoc, removePunctuation)
+        # Eliminate extra white spaces
+        TextDoc <- tm_map(TextDoc, stripWhitespace)
+        # Text stemming - which reduces words to their root form
+        TextDoc <- tm_map(TextDoc, stemDocument)
+        
+        # Build a term-document matrix
+        TextDoc_dtm <- TermDocumentMatrix(TextDoc)
+        dtm_m <- as.matrix(TextDoc_dtm)
+        # Sort by descearing value of frequency
+        dtm_v <- sort(rowSums(dtm_m),decreasing=TRUE)
+        dtm_d <- data.frame(word = names(dtm_v),freq=dtm_v)
+        # Display the top 5 most frequent words
+        #head(dtm_d, 5)
+        
+        return(text)
+        
+        
+    })
+
+    
+```
+
+Analysis
+===============================
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Top 5 Most Frequently Used Words
+
+```{r}
+plotOutput("FrequentWords")
+output$FrequentWords <- renderPlot({
+        
+        # input$file1 will be NULL initially. After the user selects
+        # and uploads a file, head of that data file by default,
+        # or all rows if selected, will be shown.
+        
+        req(input$file1)
+        
+        text <- readLines(input$file1$datapath)
+        # Load the data as a corpus
+        TextDoc <- Corpus(VectorSource(text))
+        
+        #Replacing "/", "@" and "|" with space
+        toSpace <- content_transformer(function (x , pattern ) gsub(pattern, " ", x))
+        TextDoc <- tm_map(TextDoc, toSpace, "/")
+        TextDoc <- tm_map(TextDoc, toSpace, "@")
+        TextDoc <- tm_map(TextDoc, toSpace, "\\|")
+        # Convert the text to lower case
+        TextDoc <- tm_map(TextDoc, content_transformer(tolower))
+        # Remove numbers
+        TextDoc <- tm_map(TextDoc, removeNumbers)
+        # Remove english common stopwords
+        TextDoc <- tm_map(TextDoc, removeWords, stopwords("english"))
+        # Remove your own stop word
+        # specify your custom stopwords as a character vector
+        TextDoc <- tm_map(TextDoc, removeWords, c("s", "company", "team")) 
+        # Remove punctuations
+        TextDoc <- tm_map(TextDoc, removePunctuation)
+        # Eliminate extra white spaces
+        TextDoc <- tm_map(TextDoc, stripWhitespace)
+        # Text stemming - which reduces words to their root form
+        TextDoc <- tm_map(TextDoc, stemDocument)
+        
+        # Build a term-document matrix
+        TextDoc_dtm <- TermDocumentMatrix(TextDoc)
+        dtm_m <- as.matrix(TextDoc_dtm)
+        # Sort by descearing value of frequency
+        dtm_v <- sort(rowSums(dtm_m),decreasing=TRUE)
+        dtm_d <- data.frame(word = names(dtm_v),freq=dtm_v)
+        # Display the top 5 most frequent words
+        head(dtm_d, 5)
+        
+        return(barplot(dtm_d$freq, las = 2, names.arg = dtm_d$word,
+        col ="lightgreen", main ="Top 5 most frequent words",
+        ylab = "Word frequencies"))
+})
+```
+
+### Pie Chart
+
+```{r}
+plotOutput("density")
+output$density <- renderPlot({
+        
+        # input$file1 will be NULL initially. After the user selects
+        # and uploads a file, head of that data file by default,
+        # or all rows if selected, will be shown.
+        
+        req(input$file1)
+        
+        text <- readLines(input$file1$datapath)
+        # Load the data as a corpus
+        TextDoc <- Corpus(VectorSource(text))
+        
+        #Replacing "/", "@" and "|" with space
+        toSpace <- content_transformer(function (x , pattern ) gsub(pattern, " ", x))
+        TextDoc <- tm_map(TextDoc, toSpace, "/")
+        TextDoc <- tm_map(TextDoc, toSpace, "@")
+        TextDoc <- tm_map(TextDoc, toSpace, "\\|")
+        # Convert the text to lower case
+        TextDoc <- tm_map(TextDoc, content_transformer(tolower))
+        # Remove numbers
+        TextDoc <- tm_map(TextDoc, removeNumbers)
+        # Remove english common stopwords
+        TextDoc <- tm_map(TextDoc, removeWords, stopwords("english"))
+        # Remove your own stop word
+        # specify your custom stopwords as a character vector
+        TextDoc <- tm_map(TextDoc, removeWords, c("s", "company", "team")) 
+        # Remove punctuations
+        TextDoc <- tm_map(TextDoc, removePunctuation)
+        # Eliminate extra white spaces
+        TextDoc <- tm_map(TextDoc, stripWhitespace)
+        # Text stemming - which reduces words to their root form
+        TextDoc <- tm_map(TextDoc, stemDocument)
+        
+        # Build a term-document matrix
+        TextDoc_dtm <- TermDocumentMatrix(TextDoc)
+        dtm_m <- as.matrix(TextDoc_dtm)
+        # Sort by descearing value of frequency
+        dtm_v <- sort(rowSums(dtm_m),decreasing=TRUE)
+        dtm_d <- data.frame(word = names(dtm_v),freq=dtm_v)
+        syuzhet_vector <- get_sentiment(text, method="syuzhet")
+# see the first row of the vector
+head(syuzhet_vector)
+# see summary statistics of the vector
+summary(syuzhet_vector)
+d<-get_nrc_sentiment(text)
+# head(d,10) - to see top 10 lines of the get_nrc_sentiment dataframe
+head(d,10)
+td<-data.frame(t(d))
+#The function rowSums computes column sums across rows for each level of a grouping variable.
+td_new <- data.frame(rowSums(td))
+#Transformation and cleaning
+names(td_new)[1] <- "count"
+td_new <- cbind("sentiment" = rownames(td_new), td_new)
+rownames(td_new) <- NULL
+td_new2<-td_new[1:8,]
+
+        # Display the top 5 most frequent words
+        return(ggplot(td_new2, aes(x="", y=sentiment, fill=sentiment)) +geom_bar(stat="identity", width=1) +
+  coord_polar("y", start=0)+theme_void() 
+)
+})
+
+```
+
+
+### Word Cloud
+
+```{r}
+plotOutput("cloud")
+output$cloud <- renderPlot({
+        
+        # input$file1 will be NULL initially. After the user selects
+        # and uploads a file, head of that data file by default,
+        # or all rows if selected, will be shown.
+        
+        req(input$file1)
+        
+        text <- readLines(input$file1$datapath)
+        # Load the data as a corpus
+        TextDoc <- Corpus(VectorSource(text))
+        
+        #Replacing "/", "@" and "|" with space
+        toSpace <- content_transformer(function (x , pattern ) gsub(pattern, " ", x))
+        TextDoc <- tm_map(TextDoc, toSpace, "/")
+        TextDoc <- tm_map(TextDoc, toSpace, "@")
+        TextDoc <- tm_map(TextDoc, toSpace, "\\|")
+        # Convert the text to lower case
+        TextDoc <- tm_map(TextDoc, content_transformer(tolower))
+        # Remove numbers
+        TextDoc <- tm_map(TextDoc, removeNumbers)
+        # Remove english common stopwords
+        TextDoc <- tm_map(TextDoc, removeWords, stopwords("english"))
+        # Remove your own stop word
+        # specify your custom stopwords as a character vector
+        TextDoc <- tm_map(TextDoc, removeWords, c("s", "company", "team")) 
+        # Remove punctuations
+        TextDoc <- tm_map(TextDoc, removePunctuation)
+        # Eliminate extra white spaces
+        TextDoc <- tm_map(TextDoc, stripWhitespace)
+        # Text stemming - which reduces words to their root form
+        TextDoc <- tm_map(TextDoc, stemDocument)
+        
+        # Build a term-document matrix
+        TextDoc_dtm <- TermDocumentMatrix(TextDoc)
+        dtm_m <- as.matrix(TextDoc_dtm)
+        # Sort by descearing value of frequency
+        dtm_v <- sort(rowSums(dtm_m),decreasing=TRUE)
+        dtm_d <- data.frame(word = names(dtm_v),freq=dtm_v)
+        # Display the top 5 most frequent words
+        set.seed(1234)
+      
+       # wordcloud2(data=dtm_d, size = 0.7, shape = 'pentagon')
+        return(wordcloud(words = dtm_d$word, freq = dtm_d$freq, min.freq = 1,
+          max.words=100, random.order=FALSE, rot.per=0.40, 
+          colors=brewer.pal(8, "Dark2")))
+        
+})
+
+
+```
+
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Emotions in Text
+
+```{r}
+plotOutput("emotions")
+output$emotions <- renderPlot({
+        
+        # input$file1 will be NULL initially. After the user selects
+        # and uploads a file, head of that data file by default,
+        # or all rows if selected, will be shown.
+        
+        req(input$file1)
+        
+        text <- readLines(input$file1$datapath)
+        # Load the data as a corpus
+        TextDoc <- Corpus(VectorSource(text))
+        
+        #Replacing "/", "@" and "|" with space
+        toSpace <- content_transformer(function (x , pattern ) gsub(pattern, " ", x))
+        TextDoc <- tm_map(TextDoc, toSpace, "/")
+        TextDoc <- tm_map(TextDoc, toSpace, "@")
+        TextDoc <- tm_map(TextDoc, toSpace, "\\|")
+        # Convert the text to lower case
+        TextDoc <- tm_map(TextDoc, content_transformer(tolower))
+        # Remove numbers
+        TextDoc <- tm_map(TextDoc, removeNumbers)
+        # Remove english common stopwords
+        TextDoc <- tm_map(TextDoc, removeWords, stopwords("english"))
+        # Remove your own stop word
+        # specify your custom stopwords as a character vector
+        TextDoc <- tm_map(TextDoc, removeWords, c("s", "company", "team")) 
+        # Remove punctuations
+        TextDoc <- tm_map(TextDoc, removePunctuation)
+        # Eliminate extra white spaces
+        TextDoc <- tm_map(TextDoc, stripWhitespace)
+        # Text stemming - which reduces words to their root form
+        TextDoc <- tm_map(TextDoc, stemDocument)
+        
+        # Build a term-document matrix
+        TextDoc_dtm <- TermDocumentMatrix(TextDoc)
+        dtm_m <- as.matrix(TextDoc_dtm)
+        # Sort by descearing value of frequency
+        dtm_v <- sort(rowSums(dtm_m),decreasing=TRUE)
+        dtm_d <- data.frame(word = names(dtm_v),freq=dtm_v)
+        syuzhet_vector <- get_sentiment(text, method="syuzhet")
+# see the first row of the vector
+head(syuzhet_vector)
+# see summary statistics of the vector
+summary(syuzhet_vector)
+d<-get_nrc_sentiment(text)
+# head(d,10) - to see top 10 lines of the get_nrc_sentiment dataframe
+
+td<-data.frame(t(d))
+#The function rowSums computes column sums across rows for each level of a grouping variable.
+td_new <- data.frame(rowSums(td))
+#Transformation and cleaning
+names(td_new)[1] <- "count"
+td_new <- cbind("sentiment" = rownames(td_new), td_new)
+rownames(td_new) <- NULL
+td_new2<-td_new[1:8,]
+        # Display the top 5 most frequent words
+        
+        return(barplot(sort(colSums(prop.table(d[, 1:8]))),horiz = TRUE, cex.names = 0.7,las = 1, main = "Emotions in Text", xlab="Percentage"))
+})
+
+#Plot two - count of words associated with each sentiment, expressed as a percentage
+
+```
+
+### Sentimental Analysis
+
+
+```{r}
+plotOutput("Sentiment")
+output$Sentiment <- renderPlot({
+        
+        # input$file1 will be NULL initially. After the user selects
+        # and uploads a file, head of that data file by default,
+        # or all rows if selected, will be shown.
+        
+        req(input$file1)
+        
+        text <- readLines(input$file1$datapath)
+        # Load the data as a corpus
+        TextDoc <- Corpus(VectorSource(text))
+        
+        #Replacing "/", "@" and "|" with space
+        toSpace <- content_transformer(function (x , pattern ) gsub(pattern, " ", x))
+        TextDoc <- tm_map(TextDoc, toSpace, "/")
+        TextDoc <- tm_map(TextDoc, toSpace, "@")
+        TextDoc <- tm_map(TextDoc, toSpace, "\\|")
+        # Convert the text to lower case
+        TextDoc <- tm_map(TextDoc, content_transformer(tolower))
+        # Remove numbers
+        TextDoc <- tm_map(TextDoc, removeNumbers)
+        # Remove english common stopwords
+        TextDoc <- tm_map(TextDoc, removeWords, stopwords("english"))
+        # Remove your own stop word
+        # specify your custom stopwords as a character vector
+        TextDoc <- tm_map(TextDoc, removeWords, c("s", "company", "team")) 
+        # Remove punctuations
+        TextDoc <- tm_map(TextDoc, removePunctuation)
+        # Eliminate extra white spaces
+        TextDoc <- tm_map(TextDoc, stripWhitespace)
+        # Text stemming - which reduces words to their root form
+        TextDoc <- tm_map(TextDoc, stemDocument)
+        
+        # Build a term-document matrix
+        TextDoc_dtm <- TermDocumentMatrix(TextDoc)
+        dtm_m <- as.matrix(TextDoc_dtm)
+        # Sort by descearing value of frequency
+        dtm_v <- sort(rowSums(dtm_m),decreasing=TRUE)
+        dtm_d <- data.frame(word = names(dtm_v),freq=dtm_v)
+        syuzhet_vector <- get_sentiment(text, method="syuzhet")
+# see the first row of the vector
+head(syuzhet_vector)
+# see summary statistics of the vector
+summary(syuzhet_vector)
+d<-get_nrc_sentiment(text)
+# head(d,10) - to see top 10 lines of the get_nrc_sentiment dataframe
+head(d,10)
+td<-data.frame(t(d))
+#The function rowSums computes column sums across rows for each level of a grouping variable.
+td_new <- data.frame(rowSums(td))
+#Transformation and cleaning
+names(td_new)[1] <- "count"
+td_new <- cbind("sentiment" = rownames(td_new), td_new)
+rownames(td_new) <- NULL
+td_new2<-td_new[1:8,]
+        # Display the top 5 most frequent words
+        
+        return(quickplot(sentiment, data=td_new2, weight=count, geom="bar", fill=sentiment, ylab="count")+ggtitle("Survey sentiments"))
+})
+
+#Plot One - count of words associated with each sentiment
+
+```
+
+
+
+
+WellBeing FlashCards
+===============================
+
+<center><h1 style="color:white;">Tip Of The Day</h1></center>
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+```{r}
+
+
+column(width = 4, offset = 4,
+            valueBox(value= tags$img(height = 300, width = 300,src = "img1.jpg",style="display: block;
+  margin-left: auto;
+  margin-right: auto;"),icon="fa-user"))
+
+```
+Column {data-width=350}
+-----------------------------------------------------------------------
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+```{r}
+
+a<-"Establish regular exercise routines in your life."
+b<-"Continue to work on eating healthily; vigilance will always be needed to be successful."
+c<-"See your doctor regularly for wellness exams and health/disease screenings/tests."
+d<-"If you have symptoms, seek medical attention; don’t ignore warning signs of issues."
+e<-"Along with your body, make efforts to stimulate and strengthen your brain as you age."
+f<-"Maintain satisfying social relationships."
+g<-"Keep involved in activities and pursuits that interest you."
+h<-"Try to maintain a positive attitude to support your resilience when life hands you setbacks."
+i<-"Keep your body hydrated with water."
+j<-"Take care of your skin."
+k<-"Know your health numbers and what they mean, regardless of how healthy or unhealthy you are now."
+l<-"Get adequate sleep."
+m<-"Spend less time in front of the TV; at minimum, get up and move during commercials."
+n<-"Learn to relax more."
+o<-"Focus less on your weight, and more on your overall health."
+p<-"Find things to be grateful for in your life."
+q<-"Don’t forget to smile and laugh routinely."
+r<-"Do something fun every day."
+s<-"Have a sense of purpose in your life.Think about what is yours?"
+t<-"Read Enemy Pie, a picture book which will teach you alot"
+
+
+tips <- c(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t)
+num=round(runif(1)*20)
+ans=tips[num]
+
+
+column(width = 4, offset = 4,
+            valueBox(value= tags$p(ans, style = "color:white;font-size: 200%;text-align:center;border-style: inset;border-color:white;"),icon="fa-user"))
+
+
+
+
+
+```
+
+
+Toxic People
+=====================================================================
+
+<h1 style="color:white;">Toxic Person Check</h1>
+Column {data-height=200}
+----------------------------------------------------------------------
+
+```{r}
+  
+textInput("toxicity", "Let's find out the impact of a person on your life")
+
+```
+
+
+Column {data-width=20}
+----------------------------------------------------------------------
+```{r}
+
+UserInput <- reactive({c(input$toxicity)})
+
+plotOutput('Toxic')
+output$Toxic <- renderPlot({
+  
+      
+        
+        # input$file1 will be NULL initially. After the user selects
+        # and uploads a file, head of that data file by default,
+        # or all rows if selected, will be shown.
+        
+        req(input$file1)
+        text <- readLines(input$file1$datapath)
+        print(typeof(text))
+        print(text)
+        data=toString(text)
+        print(data)
+        data_split <- strsplit(data,"")[[1]];
+data_lines<-c();
+lines<-"";
+for(i in data_split){
+  if(i=='.'){
+    lines<-paste(lines,i,sep="");
+    data_lines<-append(data_lines,lines);
+    lines<-''
+  }else{
+    lines<-paste(lines,i,sep="");
+  }
+}
+print(data_lines)
+special_lines<-c();
+
+special_word <- UserInput()
+print("HIIII")
+print(special_word)
+special_word <- toString(special_word)
+#special_word <- "Ishita";
+
+for(line in data_lines){
+  words<-strsplit(line," ");
+    if(grepl(special_word,words)){
+      special_lines<-append(special_lines,line);
+    }
+}
+print(special_lines);
+        # Load the data as a corpus
+        TextDoc <- Corpus(VectorSource(special_lines))
+        
+        #Replacing "/", "@" and "|" with space
+        toSpace <- content_transformer(function (x , pattern ) gsub(pattern, " ", x))
+        TextDoc <- tm_map(TextDoc, toSpace, "/")
+        TextDoc <- tm_map(TextDoc, toSpace, "@")
+        TextDoc <- tm_map(TextDoc, toSpace, "\\|")
+        # Convert the text to lower case
+        TextDoc <- tm_map(TextDoc, content_transformer(tolower))
+        # Remove numbers
+        TextDoc <- tm_map(TextDoc, removeNumbers)
+        # Remove english common stopwords
+        TextDoc <- tm_map(TextDoc, removeWords, stopwords("english"))
+        # Remove your own stop word
+        # specify your custom stopwords as a character vector
+        TextDoc <- tm_map(TextDoc, removeWords, c("s", "company", "team")) 
+        # Remove punctuations
+        TextDoc <- tm_map(TextDoc, removePunctuation)
+        # Eliminate extra white spaces
+        TextDoc <- tm_map(TextDoc, stripWhitespace)
+        # Text stemming - which reduces words to their root form
+        TextDoc <- tm_map(TextDoc, stemDocument)
+        
+        # Build a term-document matrix
+        TextDoc_dtm <- TermDocumentMatrix(TextDoc)
+        dtm_m <- as.matrix(TextDoc_dtm)
+        # Sort by descearing value of frequency
+        dtm_v <- sort(rowSums(dtm_m),decreasing=TRUE)
+        dtm_d <- data.frame(word = names(dtm_v),freq=dtm_v)
+        
+        syuzhet_vector <- get_sentiment(special_lines, method="syuzhet")
+# see the first row of the vector
+head(syuzhet_vector)
+# see summary statistics of the vector
+summary(syuzhet_vector)
+d<-get_nrc_sentiment(special_lines)
+
+# head(d,10) - to see top 10 lines of the get_nrc_sentiment dataframe
+print(head(d,10))
+td<-data.frame(t(d))
+#The function rowSums computes column sums across rows for each level of a grouping variable.
+td_new <- data.frame(rowSums(td))
+C <- data.frame(rowSums(td))
+
+
+#Transformation and cleaning
+names(td_new)[1] <- "count"
+td_new <- cbind("sentiment" = rownames(td_new), td_new)
+rownames(td_new) <- NULL
+td_new2<-td_new[9:10,]
+        # Display the top 5 most frequent words
+        
+        return(quickplot(sentiment, data=td_new2, weight=count, geom="bar", fill=sentiment, ylab="count")+ggtitle("Survey sentiments"))
+})
+
+```
+
+Export Your Diary On Your Whatsapp {data-width=350}
+=====================================================================
+<br><br><br><br>
+<table border='0'>
+<tr>
+<td><h4 style="color:white;">Enter Your Whatsapp Number To export the Data <br>(With your Country Codes eg : +91) :</td>
+
+<td>
+```{r}
+textInput("contact", "", "")
+```
+</h4>
+</td>
+</tr>
+
+<tr>
+<td>
+<h4 style="color:white;">Enter Your Twilio Registered SID :</td>
+
+<td>
+```{r}
+textInput("sid", "", "")
+```
+</h4>
+</td>
+</tr>
+
+<tr>
+<td>
+<h4 style="color:white;">Enter Your Twilio Registered Token ID :</td>
+<td>
+
+```{r}
+textInput("token", "", "")
+```
+
+</h4>
+</td>
+</tr>
+</table>
+
+<center><b><h1 style="font-family: sans-serif;color:white;">Powered By Twilio</h1></b></center>
+
+Column {data-width=20}
+----------------------------------------------------------------------
+
+
+```{r}
+column(width = 4, offset = 4,
+            valueBox(value= tags$img(height = 100, width = 100,src = "twilio.png",style="display: block;
+  margin-left: auto;
+  margin-right: auto;"),icon="fa-user"))
+
+ContactInput <- reactive({c(input$contact)})
+SidInput <- reactive({c(input$sid)})
+TokenInput <- reactive({c(input$token)})
+
+textOutput("export")
+
+output$export <- renderText({
+  library("twilio")
+  req(input$file1)
+  text <- readLines(input$file1$datapath)
+  data=toString(text)
+  
+Sys.setenv(TWILIO_SID = toString(SidInput()))
+Sys.setenv(TWILIO_TOKEN = toString(TokenInput()))
+
+temp = 'whatsapp:'
+temp2 = toString(ContactInput())
+
+temp3 = paste(temp,temp2)
+temp3=gsub(" ", "", temp3, fixed = TRUE)
+
+my_message <- tw_send_message(
+ 
+  from='whatsapp:+14155238886',  
+body=paste(data),      
+to=temp3
+)
+p<- "Your Diary is Exported !! Check your Whatsapp."
+  return(p)
+
+}) 
+
+
+```
+
+
